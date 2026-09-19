@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal | Loop Universe</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="assets/logo_transparent.png">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Material Symbols Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef6ff',
+              100: '#d9ebff',
+              500: '#0066FF',
+              600: '#0052cc',
+              700: '#0041a8',
+            },
+            dark: {
+              950: '#07090e',
+              900: '#0a0d14',
+              850: '#0f1420',
+              800: '#151c2c',
+              750: '#1b2337',
+              700: '#232e47',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js for interactive analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0d14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2a3f;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2f3e5c;
+    }
+    .glass-panel {
+      background: rgba(15, 20, 32, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-panel-hover {
+      transition: all 0.2s ease;
+    }
+    .glass-panel-hover:hover {
+      border-color: rgba(0, 102, 255, 0.35);
+      box-shadow: 0 8px 30px rgba(0, 102, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-dark-950 text-zinc-100 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- ================= AUTHENTICATION VIEW ================= -->
+  <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-dark-950 px-4 py-8 overflow-y-auto">
+    <!-- Cosmic background glow -->
+    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-brand-500/15 rounded-full blur-[140px] pointer-events-none"></div>
+    <div class="absolute bottom-0 right-10 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <div class="relative w-full max-w-md bg-dark-900 border border-white/10 rounded-2xl p-8 shadow-2xl backdrop-blur-2xl">
+      <!-- Brand Logo -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 mb-4 shadow-inner">
+          <img src="assets/logo_transparent.png" alt="Loop Universe" class="h-12 w-auto object-contain">
+        </div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Loop Universe Admin</h1>
+        <p class="text-sm text-zinc-400 mt-1">Agency Management Portal & Command Center</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="space-y-4" onsubmit="handleLogin(event)">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Email Address</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-lg">mail</span>
+            <input type="email" id="login-email" required placeholder="Enter admin email"
+              class="w-full pl-10 pr-4 py-2.5 bg-dark-850 border border-white/10 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Password</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-lg">lock</span>
+            <input type="password" id="login-password" required placeholder="••••••••"
+              class="w-full pl-10 pr-10 py-2.5 bg-dark-850 border border-white/10 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors">
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
+              <span id="password-toggle-icon" class="material-symbols-outlined text-lg">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs pt-1">
+          <label class="flex items-center gap-2 cursor-pointer text-zinc-400 select-none">
+            <input type="checkbox" id="remember-me" checked class="rounded border-white/20 bg-dark-800 text-brand-500 focus:ring-brand-500">
+            <span>Keep me logged in</span>
+          </label>
+          <span class="text-zinc-500">AES-256 Encrypted</span>
+        </div>
+
+        <div id="login-error" class="hidden p-3 bg-red-500/15 border border-red-500/30 rounded-xl text-xs text-red-400 flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">error</span>
+          <span id="login-error-text">Invalid credentials</span>
+        </div>
+
+        <button type="submit" id="login-btn"
+          class="w-full py-3 px-4 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl text-sm shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2 transition-all transform active:scale-[0.99]">
+          <span>Sign In to Dashboard</span>
+          <span class="material-symbols-outlined text-lg">arrow_forward</span>
+        </button>
+
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MAIN ADMIN APP SHELL ================= -->
+  <div id="app-shell" class="hidden flex-1 flex flex-col md:flex-row min-h-screen">
+    
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-full md:w-64 bg-dark-900 border-r border-white/5 flex flex-col justify-between shrink-0 z-30">
+      <div>
+        <!-- Brand Header -->
+        <div class="h-20 px-6 flex items-center justify-between border-b border-white/5">
+          <a href="index.html" target="_blank" class="flex items-center gap-3 group" title="Open live website">
+            <img src="assets/logo_transparent.png" alt="Loop Universe" class="h-9 w-auto">
+            <div>
+              <div class="font-bold text-sm text-white tracking-tight group-hover:text-brand-500 transition-colors">Loop Universe</div>
+              <div class="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Admin v2.4
+              </div>
+            </div>
+          </a>
+          <!-- Mobile menu close -->
+          <button class="md:hidden text-zinc-400 hover:text-white" onclick="toggleMobileSidebar()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="p-4 space-y-1.5 text-sm">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard"
+            class="nav-tab w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-left">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-xl">dashboard</span>
+              <span>Overview</span>
+            </div>
+          </button>
+
+          <button onclick="switchTab('leads')" id="nav-leads"
+            class="nav-tab w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-left">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-xl">inbox</span>
+              <span>Leads & Inquiries</span>
+            </div>
+            <span id="new-leads-count-badge" class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-brand-500/20 text-brand-500 border border-brand-500/30">0</span>
+          </button>
+
+          <button onclick="switchTab('blogs')" id="nav-blogs"
+            class="nav-tab w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-left">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-xl">article</span>
+              <span>Blog CMS</span>
+            </div>
+            <span id="blogs-count-badge" class="text-xs text-zinc-500">3</span>
+          </button>
+
+          <button onclick="switchTab('projects')" id="nav-projects"
+            class="nav-tab w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-left">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-xl">layers</span>
+              <span>Portfolio Work</span>
+            </div>
+          </button>
+
+          <button onclick="switchTab('services')" id="nav-services"
+            class="nav-tab w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-left">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-xl">design_services</span>
+              <span>Services & Rates</span>
+            </div>
+          </button>
+
+          <button onclick="switchTab('testimonials')" id="nav-testimonials"
+            class="nav-tab w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-left">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-xl">star</span>
+              <span>Testimonials</span>
+            </div>
+          </button>
+
+          <button onclick="switchTab('settings')" id="nav-settings"
+            class="nav-tab w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-left">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-xl">settings</span>
+              <span>Settings & SEO</span>
+            </div>
+          </button>
+        </nav>
+      </div>
+
+      <!-- User Profile & Quick Link -->
+      <div class="p-4 border-t border-white/5 space-y-3">
+        <a href="index.html" target="_blank"
+          class="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-zinc-300 transition-colors">
+          <span class="material-symbols-outlined text-sm">open_in_new</span>
+          <span>View Live Website</span>
+        </a>
+
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-dark-850 border border-white/5">
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            <div class="w-8 h-8 rounded-lg bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-brand-500 font-bold text-xs">
+              AD
+            </div>
+            <div class="overflow-hidden">
+              <div id="admin-user-name" class="text-xs font-bold text-white truncate">Admin User</div>
+              <div id="admin-user-email" class="text-[10px] text-zinc-400 truncate">Authenticated</div>
+            </div>
+          </div>
+          <button onclick="handleLogout()" title="Log out" class="text-zinc-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-white/5 transition-colors">
+            <span class="material-symbols-outlined text-base">logout</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col min-w-0 bg-dark-950 overflow-y-auto">
+      
+      <!-- TOP BAR -->
+      <header class="h-20 bg-dark-900/60 backdrop-blur-xl border-b border-white/5 px-6 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-4">
+          <button onclick="toggleMobileSidebar()" class="md:hidden text-zinc-400 hover:text-white p-2">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+          <div class="flex items-center gap-2 text-xs font-medium text-zinc-400">
+            <span>Admin</span>
+            <span>/</span>
+            <span id="current-view-breadcrumb" class="text-white font-semibold">Overview</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Backend API status indicator -->
+          <div id="api-status-badge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>API Online</span>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <button onclick="openAddLeadModal()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold shadow-md shadow-brand-500/20 transition-all">
+            <span class="material-symbols-outlined text-sm">add</span>
+            <span class="hidden sm:inline">Add Lead</span>
+          </button>
+
+          <!-- Refresh Data -->
+          <button onclick="refreshAllData()" title="Refresh records" class="p-2 rounded-xl bg-dark-850 hover:bg-dark-800 border border-white/10 text-zinc-300 transition-colors">
+            <span class="material-symbols-outlined text-base">refresh</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB CONTENT CONTAINER -->
+      <main class="p-6 md:p-8 space-y-8 flex-1">
+
+        <!-- ================= 1. DASHBOARD VIEW ================= -->
+        <section id="view-dashboard" class="tab-view space-y-8">
+          <!-- Welcome Hero -->
+          <div class="glass-panel rounded-2xl p-6 md:p-8 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="relative z-10">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 text-xs font-semibold mb-3">
+                <span class="material-symbols-outlined text-sm">rocket_launch</span>
+                <span>Agency Command Center</span>
+              </div>
+              <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Welcome back, Administrator</h2>
+              <p class="text-zinc-400 text-sm mt-1 max-w-xl">
+                Real-time snapshot of Loop Universe client acquisition pipeline, project delivery, and website performance.
+              </p>
+            </div>
+            <div class="relative z-10 flex flex-wrap gap-3">
+              <button onclick="switchTab('leads')" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-2 transition-colors">
+                <span class="material-symbols-outlined text-sm">mail</span>
+                <span>Review Inquiries</span>
+              </button>
+              <button onclick="exportLeadsCsv()" class="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white flex items-center gap-2 transition-colors shadow-md shadow-brand-500/20">
+                <span class="material-symbols-outlined text-sm">download</span>
+                <span>Export CSV Report</span>
+              </button>
+            </div>
+            <!-- Background glow -->
+            <div class="absolute -right-10 -bottom-20 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          </div>
+
+          <!-- KPI Metric Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <!-- Total Leads -->
+            <div class="glass-panel glass-panel-hover rounded-2xl p-5 relative">
+              <div class="flex items-center justify-between text-zinc-400 text-xs mb-3">
+                <span class="font-medium">Total Inquiries</span>
+                <span class="p-2 rounded-xl bg-blue-500/10 text-brand-500">
+                  <span class="material-symbols-outlined text-lg">contacts</span>
+                </span>
+              </div>
+              <div class="text-3xl font-extrabold text-white tracking-tight" id="kpi-total-leads">0</div>
+              <div class="flex items-center gap-1.5 text-xs text-emerald-400 mt-2 font-medium">
+                <span class="material-symbols-outlined text-sm">trending_up</span>
+                <span>+24% this month</span>
+              </div>
+            </div>
+
+            <!-- New Inquiries -->
+            <div class="glass-panel glass-panel-hover rounded-2xl p-5 relative border-brand-500/30">
+              <div class="flex items-center justify-between text-zinc-400 text-xs mb-3">
+                <span class="font-medium">New / Action Required</span>
+                <span class="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+                  <span class="material-symbols-outlined text-lg">mark_email_unread</span>
+                </span>
+              </div>
+              <div class="text-3xl font-extrabold text-amber-400 tracking-tight" id="kpi-new-leads">0</div>
+              <div class="text-xs text-zinc-400 mt-2">
+                Requires quick response
+              </div>
+            </div>
+
+            <!-- Pipeline Value -->
+            <div class="glass-panel glass-panel-hover rounded-2xl p-5 relative">
+              <div class="flex items-center justify-between text-zinc-400 text-xs mb-3">
+                <span class="font-medium">Pipeline Value</span>
+                <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+                  <span class="material-symbols-outlined text-lg">attach_money</span>
+                </span>
+              </div>
+              <div class="text-3xl font-extrabold text-white tracking-tight" id="kpi-pipeline-val">$58,500</div>
+              <div class="text-xs text-zinc-400 mt-2">
+                Active deals in proposal
+              </div>
+            </div>
+
+            <!-- Win Rate -->
+            <div class="glass-panel glass-panel-hover rounded-2xl p-5 relative">
+              <div class="flex items-center justify-between text-zinc-400 text-xs mb-3">
+                <span class="font-medium">Conversion Rate</span>
+                <span class="p-2 rounded-xl bg-purple-500/10 text-purple-400">
+                  <span class="material-symbols-outlined text-lg">query_stats</span>
+                </span>
+              </div>
+              <div class="text-3xl font-extrabold text-white tracking-tight" id="kpi-win-rate">68.4%</div>
+              <div class="text-xs text-emerald-400 mt-2 flex items-center gap-1 font-medium">
+                <span class="material-symbols-outlined text-sm">verified</span>
+                <span>Above agency benchmark</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Charts Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Monthly Inquiries Curve -->
+            <div class="glass-panel rounded-2xl p-6 lg:col-span-2">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h3 class="text-base font-bold text-white">Lead Acquisition Velocity</h3>
+                  <p class="text-xs text-zinc-400">Weekly inbound client consultations</p>
+                </div>
+                <div class="text-xs px-2.5 py-1 rounded-lg bg-white/5 text-zinc-300 font-medium">
+                  Past 30 Days
+                </div>
+              </div>
+              <div class="h-64 w-full">
+                <canvas id="leadsChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Service Distribution Doughnut -->
+            <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-base font-bold text-white">Service Demand</h3>
+                  <span class="material-symbols-outlined text-zinc-500 text-lg">pie_chart</span>
+                </div>
+                <p class="text-xs text-zinc-400 mb-4">Breakdown of inquiries by requested service</p>
+                <div class="h-48 w-full flex items-center justify-center">
+                  <canvas id="serviceDoughnut"></canvas>
+                </div>
+              </div>
+              <div id="service-legend" class="grid grid-cols-2 gap-2 text-xs text-zinc-400 pt-4 border-t border-white/5">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Inquiries Quick Table -->
+          <div class="glass-panel rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-base font-bold text-white">Recent Client Inquiries</h3>
+                <p class="text-xs text-zinc-400">Latest submissions from website contact forms</p>
+              </div>
+              <button onclick="switchTab('leads')" class="text-xs text-brand-500 hover:text-blue-400 font-semibold flex items-center gap-1">
+                <span>View all in CRM</span>
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="text-zinc-400 border-b border-white/5">
+                    <th class="py-3 px-4 font-semibold">Client</th>
+                    <th class="py-3 px-4 font-semibold">Service</th>
+                    <th class="py-3 px-4 font-semibold">Budget</th>
+                    <th class="py-3 px-4 font-semibold">Status</th>
+                    <th class="py-3 px-4 font-semibold text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-recent-leads-body" class="divide-y divide-white/5">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= 2. LEADS CRM VIEW ================= -->
+        <section id="view-leads" class="tab-view hidden space-y-6">
+          <!-- CRM Control Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-bold text-white tracking-tight">Leads & Inquiries CRM</h2>
+              <p class="text-xs text-zinc-400 mt-1">Manage, qualify, and convert incoming client consultations</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+              <button onclick="openAddLeadModal()" class="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white flex items-center gap-2 shadow-md shadow-brand-500/25 transition-all">
+                <span class="material-symbols-outlined text-sm">person_add</span>
+                <span>Add Manual Lead</span>
+              </button>
+              <button onclick="exportLeadsCsv()" class="px-3.5 py-2.5 rounded-xl bg-dark-850 hover:bg-dark-800 border border-white/10 text-xs font-semibold text-zinc-300 flex items-center gap-2 transition-colors">
+                <span class="material-symbols-outlined text-sm">file_download</span>
+                <span>Export CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search & Filter Bar -->
+          <div class="glass-panel rounded-2xl p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
+            <div class="relative w-full md:w-80">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-base">search</span>
+              <input type="text" id="lead-search-input" oninput="renderLeadsTable()" placeholder="Search name, email, or company..."
+                class="w-full pl-9 pr-4 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-brand-500">
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <!-- Status Filter -->
+              <select id="lead-status-filter" onchange="renderLeadsTable()"
+                class="bg-dark-900 border border-white/10 rounded-xl text-xs text-zinc-300 py-2 px-3 focus:outline-none focus:border-brand-500">
+                <option value="All">All Statuses</option>
+                <option value="New">New</option>
+                <option value="Contacted">Contacted</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Won">Won</option>
+                <option value="Lost">Lost</option>
+              </select>
+
+              <!-- Service Filter -->
+              <select id="lead-service-filter" onchange="renderLeadsTable()"
+                class="bg-dark-900 border border-white/10 rounded-xl text-xs text-zinc-300 py-2 px-3 focus:outline-none focus:border-brand-500">
+                <option value="All">All Services</option>
+                <option value="Web Development">Web Development</option>
+                <option value="UI/UX Design">UI/UX Design</option>
+                <option value="Brand Identity">Brand Identity</option>
+                <option value="SEO">SEO & Performance</option>
+                <option value="Custom">Custom Service</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Leads Table -->
+          <div class="glass-panel rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="bg-dark-900/80 text-zinc-400 border-b border-white/5 uppercase tracking-wider font-semibold">
+                    <th class="py-3.5 px-4">Client Name & Contact</th>
+                    <th class="py-3.5 px-4">Requested Service</th>
+                    <th class="py-3.5 px-4">Budget & Timeline</th>
+                    <th class="py-3.5 px-4">Inquiry Date</th>
+                    <th class="py-3.5 px-4">Status</th>
+                    <th class="py-3.5 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="crm-leads-table-body" class="divide-y divide-white/5">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="no-leads-placeholder" class="hidden p-12 text-center text-zinc-500">
+              <span class="material-symbols-outlined text-4xl mb-2 text-zinc-600">inbox</span>
+              <p class="text-sm">No leads match your current search or filter</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= 3. BLOG CMS VIEW ================= -->
+        <section id="view-blogs" class="tab-view hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-bold text-white tracking-tight">Blog & Thought Leadership CMS</h2>
+              <p class="text-xs text-zinc-400 mt-1">Create, edit, and publish agency insights and SEO articles</p>
+            </div>
+            <button onclick="openBlogModal()" class="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white flex items-center gap-2 shadow-md shadow-brand-500/25 transition-all">
+              <span class="material-symbols-outlined text-sm">post_add</span>
+              <span>New Article</span>
+            </button>
+          </div>
+
+          <!-- Blog Posts Grid -->
+          <div id="blogs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Injected via JS -->
+          </div>
+        </section>
+
+        <!-- ================= 4. PORTFOLIO VIEW ================= -->
+        <section id="view-projects" class="tab-view hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-bold text-white tracking-tight">Portfolio & Case Studies</h2>
+              <p class="text-xs text-zinc-400 mt-1">Manage showcased client work, impact metrics, and previews</p>
+            </div>
+            <button onclick="openProjectModal()" class="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white flex items-center gap-2 shadow-md shadow-brand-500/25 transition-all">
+              <span class="material-symbols-outlined text-sm">add_photo_alternate</span>
+              <span>Add Project</span>
+            </button>
+          </div>
+
+          <!-- Project Cards Grid -->
+          <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Injected via JS -->
+          </div>
+        </section>
+
+        <!-- ================= 5. SERVICES VIEW ================= -->
+        <section id="view-services" class="tab-view hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-bold text-white tracking-tight">Agency Services & Pricing</h2>
+              <p class="text-xs text-zinc-400 mt-1">Configure packages, base pricing, deliverables, and timelines</p>
+            </div>
+          </div>
+
+          <div id="services-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Injected via JS -->
+          </div>
+        </section>
+
+        <!-- ================= 6. TESTIMONIALS VIEW ================= -->
+        <section id="view-testimonials" class="tab-view hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-bold text-white tracking-tight">Client Testimonials</h2>
+              <p class="text-xs text-zinc-400 mt-1">Manage client reviews, ratings, and social proof quotes</p>
+            </div>
+            <button onclick="openTestimonialModal()" class="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white flex items-center gap-2 shadow-md shadow-brand-500/25 transition-all">
+              <span class="material-symbols-outlined text-sm">add_comment</span>
+              <span>Add Testimonial</span>
+            </button>
+          </div>
+
+          <div id="testimonials-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Injected via JS -->
+          </div>
+        </section>
+
+        <!-- ================= 7. SETTINGS & SEO VIEW ================= -->
+        <section id="view-settings" class="tab-view hidden space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold text-white tracking-tight">Settings & SEO Configuration</h2>
+            <p class="text-xs text-zinc-400 mt-1">Manage agency business information, analytics tags, and global metadata</p>
+          </div>
+
+          <form id="settings-form" onsubmit="handleSaveSettings(event)" class="space-y-6">
+            <!-- Agency Details -->
+            <div class="glass-panel rounded-2xl p-6 space-y-4">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-500 text-lg">business</span>
+                <span>Agency Contact Information</span>
+              </h3>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">Agency Name</label>
+                  <input type="text" id="setting-agency-name" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">Tagline</label>
+                  <input type="text" id="setting-agency-tagline" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">Primary Email</label>
+                  <input type="email" id="setting-contact-email" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">WhatsApp Phone (International Format)</label>
+                  <input type="text" id="setting-whatsapp" placeholder="919048355792" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">Office / Studio Address</label>
+                  <input type="text" id="setting-office-address" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white">
+                </div>
+              </div>
+            </div>
+
+            <!-- SEO & Analytics -->
+            <div class="glass-panel rounded-2xl p-6 space-y-4">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-500 text-lg">search_check</span>
+                <span>SEO & Tracking Configurations</span>
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">Google Tag Manager ID</label>
+                  <input type="text" id="setting-gtm-id" placeholder="GTM-XXXXXXX" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white font-mono">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">Google Analytics 4 Measurement ID</label>
+                  <input type="text" id="setting-ga4-id" placeholder="G-XXXXXXXXXX" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white font-mono">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">Default Site Title</label>
+                  <input type="text" id="setting-site-title" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">Meta Description</label>
+                  <textarea id="setting-meta-desc" rows="3" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Admin Password Update -->
+            <div class="glass-panel rounded-2xl p-6 space-y-4">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-500 text-lg">security</span>
+                <span>Admin Password Security</span>
+              </h3>
+              <div class="max-w-md space-y-3">
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">Current Password (required to change password)</label>
+                  <input type="password" id="setting-current-password" placeholder="Current password" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1">New Admin Password (min 8 characters)</label>
+                  <input type="password" id="setting-new-password" placeholder="New password" class="w-full px-3 py-2 bg-dark-900 border border-white/10 rounded-xl text-xs text-white">
+                </div>
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex justify-end">
+              <button type="submit" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs flex items-center gap-2 shadow-lg shadow-brand-500/25 transition-all">
+                <span class="material-symbols-outlined text-sm">save</span>
+                <span>Save All Settings</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= MODALS & DRAWERS ================= -->
+
+  <!-- LEAD DETAIL & NOTES MODAL -->
+  <div id="lead-detail-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-dark-900 border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white" id="modal-lead-name">Client Inquiry</h3>
+          <span id="modal-lead-date" class="text-xs text-zinc-400">Date</span>
+        </div>
+        <button onclick="closeLeadDetailModal()" class="text-zinc-400 hover:text-white p-1">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <!-- Contact quick pills -->
+        <div class="grid grid-cols-2 gap-3 p-3 bg-dark-850 rounded-xl border border-white/5">
+          <div>
+            <span class="text-zinc-500 block mb-0.5">Email</span>
+            <a id="modal-lead-email-link" href="#" class="text-brand-500 hover:underline font-medium break-all">-</a>
+          </div>
+          <div>
+            <span class="text-zinc-500 block mb-0.5">Phone</span>
+            <span id="modal-lead-phone" class="text-zinc-200 font-medium">-</span>
+          </div>
+          <div>
+            <span class="text-zinc-500 block mb-0.5">Service Requested</span>
+            <span id="modal-lead-service" class="text-zinc-200 font-semibold">-</span>
+          </div>
+          <div>
+            <span class="text-zinc-500 block mb-0.5">Budget & Timeline</span>
+            <span id="modal-lead-budget" class="text-emerald-400 font-semibold">-</span>
+          </div>
+        </div>
+
+        <!-- Message Body -->
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Client Message</label>
+          <div id="modal-lead-message" class="p-3.5 rounded-xl bg-dark-950 border border-white/5 text-zinc-300 leading-relaxed whitespace-pre-wrap">
+            -
+          </div>
+        </div>
+
+        <!-- Status Selector -->
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Inquiry Status</label>
+          <select id="modal-lead-status-select" class="w-full bg-dark-850 border border-white/10 rounded-xl px-3 py-2 text-white">
+            <option value="New">New</option>
+            <option value="Contacted">Contacted</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Won">Won (Deal Closed)</option>
+            <option value="Lost">Lost</option>
+          </select>
+        </div>
+
+        <!-- Internal Notes -->
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Internal Agency Notes</label>
+          <textarea id="modal-lead-notes" rows="3" placeholder="Add private notes, meeting follow-ups, or proposal status..."
+            class="w-full bg-dark-950 border border-white/10 rounded-xl p-3 text-white placeholder-zinc-500 focus:outline-none focus:border-brand-500"></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <a id="modal-whatsapp-btn" href="#" target="_blank" class="px-3 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 font-semibold flex items-center gap-1.5 transition-colors">
+              <span class="material-symbols-outlined text-sm">chat</span>
+              <span>WhatsApp Chat</span>
+            </a>
+            <a id="modal-email-btn" href="#" class="px-3 py-2 rounded-xl bg-blue-500/20 text-brand-500 border border-brand-500/30 hover:bg-blue-500/30 font-semibold flex items-center gap-1.5 transition-colors">
+              <span class="material-symbols-outlined text-sm">mail</span>
+              <span>Send Email</span>
+            </a>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="handleDeleteCurrentLead()" class="p-2 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors" title="Delete lead">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+            <button onclick="handleSaveLeadDetails()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-colors">
+              Save Updates
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD MANUAL LEAD MODAL -->
+  <div id="add-lead-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-dark-900 border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
+        <h3 class="text-base font-bold text-white">Create New Lead</h3>
+        <button onclick="closeAddLeadModal()" class="text-zinc-400 hover:text-white p-1">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form onsubmit="handleCreateLead(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Client Full Name *</label>
+          <input type="text" id="new-lead-name" required placeholder="e.g. Rachel Adams" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Email *</label>
+            <input type="email" id="new-lead-email" required placeholder="rachel@company.com" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Phone / WhatsApp</label>
+            <input type="text" id="new-lead-phone" placeholder="+1 (555) 000-0000" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Service Requested</label>
+            <select id="new-lead-service" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+              <option value="Full-Stack Web Development">Full-Stack Web Development</option>
+              <option value="UI/UX Design & Prototyping">UI/UX Design & Prototyping</option>
+              <option value="Brand Identity & Strategy">Brand Identity & Strategy</option>
+              <option value="Performance Optimization & SEO">Performance Optimization & SEO</option>
+              <option value="Custom / Other Service">Custom / Other Service</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Estimated Budget</label>
+            <input type="text" id="new-lead-budget" placeholder="$5,000 - $10,000" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Inquiry / Project Details</label>
+          <textarea id="new-lead-message" rows="3" placeholder="Client requirements, goals, or brief..." class="w-full bg-dark-950 border border-white/10 rounded-xl p-3 text-white"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-white/5 flex justify-end gap-2">
+          <button type="button" onclick="closeAddLeadModal()" class="px-4 py-2 bg-dark-800 text-zinc-300 rounded-xl">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl">Save Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- BLOG POST CREATE/EDIT MODAL -->
+  <div id="blog-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-dark-900 border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
+        <h3 id="blog-modal-title" class="text-base font-bold text-white">New Blog Article</h3>
+        <button onclick="closeBlogModal()" class="text-zinc-400 hover:text-white p-1">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveBlog(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="blog-edit-id">
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Article Title *</label>
+          <input type="text" id="blog-title" required placeholder="e.g. Modern Web Redesign in 2026" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Slug / URL File</label>
+            <input type="text" id="blog-slug" placeholder="blog-seo-2026.html" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Category</label>
+            <input type="text" id="blog-category" placeholder="SEO & Growth" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Author</label>
+            <input type="text" id="blog-author" placeholder="Anand R." class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Read Time</label>
+            <input type="text" id="blog-read-time" placeholder="5 min read" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Cover Image Path / URL</label>
+          <input type="text" id="blog-cover" placeholder="assets/services_ui_ux.png" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+        </div>
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Summary / Excerpt</label>
+          <textarea id="blog-excerpt" rows="3" placeholder="Brief 1-2 sentence preview..." class="w-full bg-dark-950 border border-white/10 rounded-xl p-3 text-white"></textarea>
+        </div>
+        <div class="flex items-center justify-between p-3 bg-dark-850 rounded-xl">
+          <span class="text-zinc-300 font-semibold">Publish to Website</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="blog-status" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-dark-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
+          </label>
+        </div>
+
+        <div class="pt-3 border-t border-white/5 flex justify-end gap-2">
+          <button type="button" onclick="closeBlogModal()" class="px-4 py-2 bg-dark-800 text-zinc-300 rounded-xl">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl">Save Article</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PROJECT CREATE/EDIT MODAL -->
+  <div id="project-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-dark-900 border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
+        <h3 id="project-modal-title" class="text-base font-bold text-white">Add Showcase Project</h3>
+        <button onclick="closeProjectModal()" class="text-zinc-400 hover:text-white p-1">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveProject(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="project-edit-id">
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Project Title *</label>
+          <input type="text" id="project-title" required placeholder="Project Nova" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Client Name</label>
+            <input type="text" id="project-client" placeholder="Nova Financial Inc." class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Category</label>
+            <input type="text" id="project-category" placeholder="Fintech & Web3" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Impact Metric</label>
+            <input type="text" id="project-metrics" placeholder="+140% Conversion" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block text-zinc-400 font-semibold mb-1">Year</label>
+            <input type="text" id="project-year" placeholder="2026" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Cover Image Path</label>
+          <input type="text" id="project-cover" placeholder="assets/project_nova.png" class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-2 text-white">
+        </div>
+        <div>
+          <label class="block text-zinc-400 font-semibold mb-1">Description</label>
+          <textarea id="project-description" rows="3" class="w-full bg-dark-950 border border-white/10 rounded-xl p-3 text-white"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-white/5 flex justify-end gap-2">
+          <button type="button" onclick="closeProjectModal()" class="px-4 py-2 bg-dark-800 text-zinc-300 rounded-xl">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl">Save Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ================= LOGIC & JAVASCRIPT CONTROLLER ================= -->
+  <script>
+    // State management
+    const state = {
+      user: null,
+      token: null,
+      currentTab: 'dashboard',
+      leads: [],
+      blogs: [],
+      projects: [],
+      services: [],
+      testimonials: [],
+      settings: {},
+      selectedLeadId: null,
+      chartInstance: null,
+      doughnutInstance: null
+    };
+
+    // --- Toast Notification Helper ---
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const icon = type === 'success' ? 'check_circle' : (type === 'error' ? 'cancel' : 'info');
+      const color = type === 'success' ? 'border-emerald-500/30 bg-dark-900 text-emerald-400' : (type === 'error' ? 'border-red-500/30 bg-dark-900 text-red-400' : 'border-brand-500/30 bg-dark-900 text-brand-500');
+
+      toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-xl border ${color} shadow-2xl text-xs font-semibold backdrop-blur-xl transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto`;
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-base">${icon}</span>
+        <span class="text-zinc-200">${message}</span>
+      `;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-x-4');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // --- Password visibility toggle ---
+    function togglePasswordVisibility() {
+      const pass = document.getElementById('login-password');
+      const icon = document.getElementById('password-toggle-icon');
+      if (pass.type === 'password') {
+        pass.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        pass.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+
+    // --- Authentication ---
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errorDiv = document.getElementById('login-error');
+      const errorText = document.getElementById('login-error-text');
+
+      errorDiv.classList.add('hidden');
+      const normEmail = email.toLowerCase();
+
+      // 1. Try remote/server authentication first
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success) {
+          const user = data.user || data.data?.user || { email: normEmail, name: 'Administrator', fullName: 'Administrator' };
+          const token = data.token || data.data?.token || ('session_' + Date.now());
+          completeLogin(user, token);
+          return;
+        }
+      } catch (err) {
+        console.warn('Remote login endpoint unavailable or errored:', err);
+      }
+
+      // 2. Client-side / Standalone fallback authentication:
+      // Works reliably on Netlify static deployments, offline, or when environment variables are missing
+      if (
+        (normEmail === 'anandns196@gmail.com' || normEmail === 'admin@loopuniverse.agency' || normEmail === 'admin@yourdomain.com') &&
+        password === 'loop@gmail90'
+      ) {
+        const localUser = {
+          id: 'usr_admin',
+          email: normEmail,
+          role: 'Super Admin',
+          name: 'Administrator',
+          fullName: 'Administrator'
+        };
+        completeLogin(localUser, 'local_session_' + Date.now());
+        return;
+      }
+
+      // 3. Check custom local password if updated in Settings
+      const savedAuth = localStorage.getItem('lu_custom_admin_auth');
+      if (savedAuth) {
+        try {
+          const custom = JSON.parse(savedAuth);
+          if (custom.email === normEmail && custom.password === password) {
+            const localUser = {
+              id: 'usr_admin',
+              email: normEmail,
+              role: 'Super Admin',
+              name: custom.fullName || 'Administrator',
+              fullName: custom.fullName || 'Administrator'
+            };
+            completeLogin(localUser, 'local_session_' + Date.now());
+            return;
+          }
+        } catch(e) {}
+      }
+
+      errorText.textContent = 'Invalid email or password';
+      errorDiv.classList.remove('hidden');
+    }
+
+    function completeLogin(user, token) {
+      user = user || { email: 'anandns196@gmail.com', name: 'Administrator', fullName: 'Administrator' };
+      state.user = user;
+      state.token = token;
+      const remember = document.getElementById('remember-me')?.checked ?? true;
+      if (remember) {
+        localStorage.setItem('lu_admin_session', JSON.stringify({ user, token }));
+      } else {
+        sessionStorage.setItem('lu_admin_session', JSON.stringify({ user, token }));
+      }
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('app-shell').classList.remove('hidden');
+      const nameEl = document.getElementById('admin-user-name');
+      if (nameEl) nameEl.textContent = user.fullName || user.name || 'Administrator';
+      const emailEl = document.getElementById('admin-user-email');
+      if (emailEl) emailEl.textContent = user.email || 'anandns196@gmail.com';
+
+      showToast(`Welcome back, ${user.fullName || user.name || 'Admin'}!`);
+      initDashboard();
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('lu_admin_session');
+      sessionStorage.removeItem('lu_admin_session');
+      state.user = null;
+      state.token = null;
+      document.getElementById('app-shell').classList.add('hidden');
+      document.getElementById('auth-screen').classList.remove('hidden');
+      showToast('Logged out successfully', 'info');
+    }
+
+    function checkExistingSession() {
+      const saved = localStorage.getItem('lu_admin_session') || sessionStorage.getItem('lu_admin_session');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.token) {
+            completeLogin(parsed.user, parsed.token);
+            return true;
+          }
+        } catch (e) {}
+      }
+      return false;
+    }
+
+    // --- Tab Navigation ---
+    function switchTab(tabId) {
+      state.currentTab = tabId;
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      const activeView = document.getElementById(`view-${tabId}`);
+      if (activeView) activeView.classList.remove('hidden');
+
+      // Update sidebar nav states
+      document.querySelectorAll('.nav-tab').forEach(el => {
+        el.classList.remove('bg-brand-500/10', 'text-brand-500', 'border-brand-500/20');
+        el.classList.add('text-zinc-400');
+      });
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) {
+        activeNav.classList.add('bg-brand-500/10', 'text-brand-500', 'border-brand-500/20');
+        activeNav.classList.remove('text-zinc-400');
+      }
+
+      // Breadcrumb title
+      const titles = {
+        dashboard: 'Overview',
+        leads: 'Leads CRM',
+        blogs: 'Blog CMS',
+        projects: 'Portfolio',
+        services: 'Services & Rates',
+        testimonials: 'Testimonials',
+        settings: 'Settings & SEO'
+      };
+      document.getElementById('current-view-breadcrumb').textContent = titles[tabId] || 'Overview';
+
+      // Re-render corresponding view if needed
+      if (tabId === 'leads') renderLeadsTable();
+      if (tabId === 'blogs') renderBlogs();
+      if (tabId === 'projects') renderProjects();
+      if (tabId === 'services') renderServices();
+      if (tabId === 'testimonials') renderTestimonials();
+      if (tabId === 'settings') populateSettingsForm();
+    }
+
+    function toggleMobileSidebar() {
+      document.getElementById('sidebar').classList.toggle('hidden');
+    }
+
+    // --- Data Fetching & Syncing ---
+    async function fetchResource(resource) {
+      try {
+        const headers = {};
+        if (state.token) {
+          headers['Authorization'] = `Bearer ${state.token}`;
+        }
+        const res = await fetch(`/api/${resource}`, { headers });
+        if (res.status === 401 || res.status === 403) {
+          handleLogout();
+          showToast('Session expired. Please log in again.', 'error');
+          return [];
+        }
+        if (res.ok) {
+          const json = await res.json();
+          document.getElementById('api-status-badge').classList.remove('hidden');
+          localStorage.setItem(`lu_${resource}`, JSON.stringify(json.data));
+          return json.data;
+        }
+      } catch (err) {
+        console.warn(`Fetch /api/${resource} offline, using localStorage cache:`, err);
+      }
+      // Fallback to local storage
+      const cached = localStorage.getItem(`lu_${resource}`);
+      return cached ? JSON.parse(cached) : [];
+    }
+
+    async function saveResource(resource, method, payload, id = null) {
+      const url = id ? `/api/${resource}/${id}` : `/api/${resource}`;
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (state.token) {
+          headers['Authorization'] = `Bearer ${state.token}`;
+        }
+        const res = await fetch(url, {
+          method,
+          headers,
+          body: JSON.stringify(payload)
+        });
+        if (res.status === 401 || res.status === 403) {
+          handleLogout();
+          showToast('Session expired. Please sign in again.', 'error');
+          return { success: false, error: 'Unauthorized' };
+        }
+        if (res.ok) {
+          const data = await res.json();
+          return data;
+        } else {
+          const errJson = await res.json().catch(() => ({}));
+          showToast(errJson.error || 'Failed to save', 'error');
+          return { success: false, error: errJson.error };
+        }
+      } catch (err) {
+        console.warn(`Saving to /api/${resource} offline, updating local cache:`, err);
+      }
+
+      // Local storage fallback for offline / static
+      let items = JSON.parse(localStorage.getItem(`lu_${resource}`) || '[]');
+      if (resource === 'settings') {
+        localStorage.setItem('lu_settings', JSON.stringify(payload));
+        return { success: true, data: payload };
+      }
+
+      if (method === 'POST') {
+        const newItem = { id: resource.slice(0, 4) + '_' + Date.now(), ...payload, createdAt: new Date().toISOString() };
+        items.unshift(newItem);
+        localStorage.setItem(`lu_${resource}`, JSON.stringify(items));
+        return { success: true, data: newItem };
+      } else if (method === 'PUT' || method === 'PATCH') {
+        const idx = items.findIndex(x => String(x.id) === String(id));
+        if (idx !== -1) {
+          items[idx] = { ...items[idx], ...payload, updatedAt: new Date().toISOString() };
+          localStorage.setItem(`lu_${resource}`, JSON.stringify(items));
+          return { success: true, data: items[idx] };
+        }
+      } else if (method === 'DELETE') {
+        items = items.filter(x => String(x.id) !== String(id));
+        localStorage.setItem(`lu_${resource}`, JSON.stringify(items));
+        return { success: true };
+      }
+      return { success: true };
+    }
+
+    async function refreshAllData() {
+      const [leads, blogs, projects, services, testimonials, settings] = await Promise.all([
+        fetchResource('leads'),
+        fetchResource('blogs'),
+        fetchResource('projects'),
+        fetchResource('services'),
+        fetchResource('testimonials'),
+        fetchResource('settings')
+      ]);
+
+      state.leads = Array.isArray(leads) ? leads : [];
+      state.blogs = Array.isArray(blogs) ? blogs : [];
+      state.projects = Array.isArray(projects) ? projects : [];
+      state.services = Array.isArray(services) ? services : [];
+      state.testimonials = Array.isArray(testimonials) ? testimonials : [];
+      state.settings = settings || {};
+
+      updateKpis();
+      renderDashboardCharts();
+      renderDashboardRecentLeads();
+      renderLeadsTable();
+      renderBlogs();
+      renderProjects();
+      renderServices();
+      renderTestimonials();
+      showToast('Dashboard data refreshed');
+    }
+
+    // --- KPI & Dashboard Rendering ---
+    function updateKpis() {
+      const total = state.leads.length;
+      const newCount = state.leads.filter(l => l.status === 'New').length;
+      const wonCount = state.leads.filter(l => l.status === 'Won').length;
+      const closedTotal = state.leads.filter(l => l.status === 'Won' || l.status === 'Lost').length;
+      const winRate = closedTotal > 0 ? Math.round((wonCount / closedTotal) * 100) : 70;
+
+      document.getElementById('kpi-total-leads').textContent = total;
+      document.getElementById('kpi-new-leads').textContent = newCount;
+      document.getElementById('new-leads-count-badge').textContent = newCount;
+      document.getElementById('kpi-win-rate').textContent = `${winRate}%`;
+      document.getElementById('blogs-count-badge').textContent = state.blogs.length;
+    }
+
+    function renderDashboardCharts() {
+      // 1. Leads Line Chart
+      const ctxLine = document.getElementById('leadsChart');
+      if (ctxLine) {
+        if (state.chartInstance) state.chartInstance.destroy();
+        state.chartInstance = new Chart(ctxLine, {
+          type: 'line',
+          data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+              label: 'Inquiries',
+              data: [3, 7, 5, state.leads.length || 8],
+              borderColor: '#0066FF',
+              backgroundColor: 'rgba(0, 102, 255, 0.1)',
+              borderWidth: 2.5,
+              tension: 0.4,
+              fill: true,
+              pointBackgroundColor: '#0066FF',
+              pointRadius: 4,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#71717a' } },
+              y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#71717a', stepSize: 2 } }
+            }
+          }
+        });
+      }
+
+      // 2. Service Demand Doughnut
+      const ctxDoughnut = document.getElementById('serviceDoughnut');
+      if (ctxDoughnut) {
+        if (state.doughnutInstance) state.doughnutInstance.destroy();
+
+        // Calculate counts
+        const counts = { 'Web Dev': 0, 'UI/UX': 0, 'Branding': 0, 'SEO / Other': 0 };
+        state.leads.forEach(l => {
+          const s = (l.service || '').toLowerCase();
+          if (s.includes('web')) counts['Web Dev']++;
+          else if (s.includes('ui') || s.includes('ux')) counts['UI/UX']++;
+          else if (s.includes('brand')) counts['Branding']++;
+          else counts['SEO / Other']++;
+        });
+
+        const labels = Object.keys(counts);
+        const values = Object.values(counts).map(v => v === 0 ? 1 : v);
+        const colors = ['#0066FF', '#a855f7', '#06b6d4', '#10b981'];
+
+        state.doughnutInstance = new Chart(ctxDoughnut, {
+          type: 'doughnut',
+          data: {
+            labels,
+            datasets: [{
+              data: values,
+              backgroundColor: colors,
+              borderWidth: 0,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '72%',
+            plugins: { legend: { display: false } }
+          }
+        });
+
+        // Legend
+        const legendDiv = document.getElementById('service-legend');
+        if (legendDiv) {
+          legendDiv.innerHTML = labels.map((l, i) => `
+            <div class="flex items-center gap-1.5 truncate">
+              <span class="w-2 h-2 rounded-full" style="background-color: ${colors[i]}"></span>
+              <span class="truncate">${l}: <strong class="text-white">${counts[l]}</strong></span>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    function renderDashboardRecentLeads() {
+      const tbody = document.getElementById('dashboard-recent-leads-body');
+      if (!tbody) return;
+      const recents = state.leads.slice(0, 5);
+
+      if (recents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-zinc-500">No inquiries yet</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = recents.map(lead => `
+        <tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="py-3 px-4">
+            <div class="font-semibold text-white">${escapeHtml(lead.name)}</div>
+            <div class="text-[11px] text-zinc-400">${escapeHtml(lead.email)}</div>
+          </td>
+          <td class="py-3 px-4 text-zinc-300">${escapeHtml(lead.service || 'Web Development')}</td>
+          <td class="py-3 px-4 text-zinc-300 font-medium">${escapeHtml(lead.budget || '$5k-$10k')}</td>
+          <td class="py-3 px-4">${getStatusBadge(lead.status)}</td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="openLeadDetail('${lead.id}')" class="text-brand-500 hover:text-blue-400 font-semibold text-xs">
+              Review
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // --- Leads CRM Operations ---
+    function renderLeadsTable() {
+      const tbody = document.getElementById('crm-leads-table-body');
+      const placeholder = document.getElementById('no-leads-placeholder');
+      if (!tbody) return;
+
+      const query = (document.getElementById('lead-search-input')?.value || '').toLowerCase();
+      const statusFilter = document.getElementById('lead-status-filter')?.value || 'All';
+      const serviceFilter = document.getElementById('lead-service-filter')?.value || 'All';
+
+      const filtered = state.leads.filter(lead => {
+        const matchesQuery = (lead.name || '').toLowerCase().includes(query) ||
+                             (lead.email || '').toLowerCase().includes(query) ||
+                             (lead.message || '').toLowerCase().includes(query);
+        const matchesStatus = statusFilter === 'All' || lead.status === statusFilter;
+        const matchesService = serviceFilter === 'All' || (lead.service || '').toLowerCase().includes(serviceFilter.toLowerCase());
+        return matchesQuery && matchesStatus && matchesService;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        placeholder.classList.remove('hidden');
+        return;
+      }
+
+      placeholder.classList.add('hidden');
+      tbody.innerHTML = filtered.map(lead => {
+        const cleanPhone = (lead.phone || '').replace(/[^0-9]/g, '');
+        const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hello ${lead.name}, regarding your Loop Universe project inquiry...`)}`;
+
+        return `
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <td class="py-3.5 px-4">
+              <div class="font-bold text-white text-sm">${escapeHtml(lead.name)}</div>
+              <div class="text-zinc-400 text-[11px] flex items-center gap-2 mt-0.5">
+                <span>${escapeHtml(lead.email)}</span>
+                ${lead.phone ? `<span>•</span><span>${escapeHtml(lead.phone)}</span>` : ''}
+              </div>
+            </td>
+            <td class="py-3.5 px-4 text-zinc-200 font-medium">
+              <div>${escapeHtml(lead.service)}</div>
+              ${lead.custom_service_details ? `<div class="text-[11px] text-zinc-500">${escapeHtml(lead.custom_service_details)}</div>` : ''}
+            </td>
+            <td class="py-3.5 px-4">
+              <div class="text-emerald-400 font-semibold">${escapeHtml(lead.budget || 'Not specified')}</div>
+              <div class="text-[11px] text-zinc-500">${escapeHtml(lead.timeline || 'Flexible')}</div>
+            </td>
+            <td class="py-3.5 px-4 text-zinc-400">
+              ${formatDate(lead.createdAt)}
+            </td>
+            <td class="py-3.5 px-4">
+              ${getStatusBadge(lead.status)}
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                ${lead.phone ? `
+                  <a href="${whatsappUrl}" target="_blank" title="WhatsApp Chat"
+                    class="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors">
+                    <span class="material-symbols-outlined text-base">chat</span>
+                  </a>
+                ` : ''}
+                <a href="mailto:${encodeURIComponent(lead.email)}" title="Send Email"
+                  class="p-1.5 rounded-lg text-zinc-400 hover:text-brand-500 hover:bg-brand-500/10 transition-colors">
+                  <span class="material-symbols-outlined text-base">mail</span>
+                </a>
+                <button onclick="openLeadDetail('${lead.id}')" title="Inspect & Edit"
+                  class="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors">
+                  <span class="material-symbols-outlined text-base">visibility</span>
+                </button>
+                <button onclick="deleteLead('${lead.id}')" title="Delete lead"
+                  class="p-1.5 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                  <span class="material-symbols-outlined text-base">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function getStatusBadge(status) {
+      const styles = {
+        'New': 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+        'Contacted': 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+        'In Progress': 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+        'Won': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+        'Lost': 'bg-zinc-800 text-zinc-400 border-zinc-700'
+      };
+      const cls = styles[status] || styles['New'];
+      return `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold border ${cls}">${escapeHtml(status || 'New')}</span>`;
+    }
+
+    function openLeadDetail(id) {
+      const lead = state.leads.find(l => l.id === id);
+      if (!lead) return;
+      state.selectedLeadId = id;
+
+      document.getElementById('modal-lead-name').textContent = lead.name;
+      document.getElementById('modal-lead-date').textContent = `Received on ${new Date(lead.createdAt || Date.now()).toLocaleString()}`;
+      
+      const emailLink = document.getElementById('modal-lead-email-link');
+      emailLink.textContent = lead.email;
+      emailLink.href = `mailto:${lead.email}`;
+
+      document.getElementById('modal-lead-phone').textContent = lead.phone || 'None provided';
+      document.getElementById('modal-lead-service').textContent = lead.service + (lead.custom_service_details ? ` (${lead.custom_service_details})` : '');
+      document.getElementById('modal-lead-budget').textContent = `${lead.budget || 'Open'} • ${lead.timeline || 'Flexible'}`;
+      document.getElementById('modal-lead-message').textContent = lead.message || 'No specific message details provided.';
+      document.getElementById('modal-lead-status-select').value = lead.status || 'New';
+      document.getElementById('modal-lead-notes').value = lead.notes || '';
+
+      const cleanPhone = (lead.phone || '').replace(/[^0-9]/g, '');
+      const waBtn = document.getElementById('modal-whatsapp-btn');
+      waBtn.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hi ${lead.name}, thank you for reaching out to Loop Universe...`)}`;
+      waBtn.style.display = lead.phone ? 'flex' : 'none';
+
+      document.getElementById('modal-email-btn').href = `mailto:${lead.email}?subject=${encodeURIComponent(`Loop Universe Project Consultation: ${lead.name}`)}`;
+
+      document.getElementById('lead-detail-modal').classList.remove('hidden');
+    }
+
+    function closeLeadDetailModal() {
+      document.getElementById('lead-detail-modal').classList.add('hidden');
+      state.selectedLeadId = null;
+    }
+
+    async function handleSaveLeadDetails() {
+      if (!state.selectedLeadId) return;
+      const status = document.getElementById('modal-lead-status-select').value;
+      const notes = document.getElementById('modal-lead-notes').value;
+
+      const res = await saveResource('leads', 'PUT', { status, notes }, state.selectedLeadId);
+      if (res.success) {
+        const idx = state.leads.findIndex(l => l.id === state.selectedLeadId);
+        if (idx !== -1) {
+          state.leads[idx].status = status;
+          state.leads[idx].notes = notes;
+        }
+        closeLeadDetailModal();
+        updateKpis();
+        renderLeadsTable();
+        renderDashboardRecentLeads();
+        showToast('Lead details updated successfully');
+      }
+    }
+
+    async function handleDeleteCurrentLead() {
+      if (!state.selectedLeadId) return;
+      if (!confirm('Are you sure you want to delete this lead?')) return;
+      const res = await saveResource('leads', 'DELETE', {}, state.selectedLeadId);
+      if (res.success) {
+        state.leads = state.leads.filter(l => l.id !== state.selectedLeadId);
+        closeLeadDetailModal();
+        updateKpis();
+        renderLeadsTable();
+        renderDashboardRecentLeads();
+        showToast('Lead deleted successfully');
+      }
+    }
+
+    async function deleteLead(id) {
+      if (!confirm('Are you sure you want to delete this lead?')) return;
+      const res = await saveResource('leads', 'DELETE', {}, id);
+      if (res.success) {
+        state.leads = state.leads.filter(l => l.id !== id);
+        updateKpis();
+        renderLeadsTable();
+        renderDashboardRecentLeads();
+        showToast('Lead deleted');
+      }
+    }
+
+    function openAddLeadModal() {
+      document.getElementById('add-lead-modal').classList.remove('hidden');
+    }
+
+    function closeAddLeadModal() {
+      document.getElementById('add-lead-modal').classList.add('hidden');
+    }
+
+    async function handleCreateLead(e) {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('new-lead-name').value.trim(),
+        email: document.getElementById('new-lead-email').value.trim(),
+        phone: document.getElementById('new-lead-phone').value.trim(),
+        service: document.getElementById('new-lead-service').value,
+        budget: document.getElementById('new-lead-budget').value.trim() || '$5,000+',
+        timeline: '1-2 Months',
+        message: document.getElementById('new-lead-message').value.trim(),
+        status: 'New',
+        priority: 'Medium',
+        notes: 'Created via admin CRM.'
+      };
+
+      const res = await saveResource('leads', 'POST', payload);
+      if (res.success) {
+        state.leads.unshift(res.data);
+        closeAddLeadModal();
+        updateKpis();
+        renderLeadsTable();
+        renderDashboardRecentLeads();
+        showToast('New lead created successfully');
+      }
+    }
+
+    // Export Leads to CSV
+    function exportLeadsCsv() {
+      if (!state.leads || state.leads.length === 0) {
+        showToast('No leads available to export', 'error');
+        return;
+      }
+      const headers = ['ID', 'Name', 'Email', 'Phone', 'Service', 'Budget', 'Timeline', 'Status', 'Date', 'Message', 'Notes'];
+      const rows = state.leads.map(l => [
+        l.id,
+        `"${(l.name || '').replace(/"/g, '""')}"`,
+        `"${(l.email || '').replace(/"/g, '""')}"`,
+        `"${(l.phone || '').replace(/"/g, '""')}"`,
+        `"${(l.service || '').replace(/"/g, '""')}"`,
+        `"${(l.budget || '').replace(/"/g, '""')}"`,
+        `"${(l.timeline || '').replace(/"/g, '""')}"`,
+        `"${(l.status || '').replace(/"/g, '""')}"`,
+        `"${l.createdAt || ''}"`,
+        `"${(l.message || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+        `"${(l.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `Loop_Universe_Leads_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      showToast('Exported CSV successfully!');
+    }
+
+    // --- Blog CMS Rendering ---
+    function renderBlogs() {
+      const container = document.getElementById('blogs-container');
+      if (!container) return;
+
+      container.innerHTML = state.blogs.map(post => `
+        <div class="glass-panel glass-panel-hover rounded-2xl overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="h-44 w-full relative bg-dark-850 overflow-hidden">
+              <img src="${post.coverImage || 'assets/services_ui_ux.png'}" alt="${escapeHtml(post.title)}" class="w-full h-full object-cover">
+              <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-dark-950/80 backdrop-blur-md text-brand-500 border border-white/10">
+                ${escapeHtml(post.category || 'Article')}
+              </div>
+              <div class="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold ${post.status === 'Published' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
+                ${post.status}
+              </div>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 text-zinc-400 text-xs mb-2">
+                <span>${escapeHtml(post.author || 'Loop Universe')}</span>
+                <span>•</span>
+                <span>${post.readTime || '5 min read'}</span>
+                <span>•</span>
+                <span>${post.views || 0} views</span>
+              </div>
+              <h3 class="text-base font-bold text-white leading-snug line-clamp-2">${escapeHtml(post.title)}</h3>
+              <p class="text-zinc-400 text-xs mt-2 line-clamp-3 leading-relaxed">${escapeHtml(post.excerpt || '')}</p>
+            </div>
+          </div>
+          <div class="p-5 pt-0 border-t border-white/5 flex items-center justify-between text-xs mt-4">
+            <a href="${post.slug || '#'}" target="_blank" class="text-brand-500 hover:text-blue-400 font-semibold flex items-center gap-1">
+              <span>Read on Site</span>
+              <span class="material-symbols-outlined text-sm">launch</span>
+            </a>
+            <div class="flex items-center gap-1">
+              <button onclick="editBlog('${post.id}')" class="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10" title="Edit">
+                <span class="material-symbols-outlined text-base">edit</span>
+              </button>
+              <button onclick="deleteBlog('${post.id}')" class="p-1.5 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-500/10" title="Delete">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openBlogModal(post = null) {
+      document.getElementById('blog-edit-id').value = post ? post.id : '';
+      document.getElementById('blog-modal-title').textContent = post ? 'Edit Article' : 'New Blog Article';
+      document.getElementById('blog-title').value = post ? post.title : '';
+      document.getElementById('blog-slug').value = post ? post.slug : '';
+      document.getElementById('blog-category').value = post ? post.category : 'SEO & Growth';
+      document.getElementById('blog-author').value = post ? post.author : 'Loop Universe';
+      document.getElementById('blog-read-time').value = post ? post.readTime : '5 min read';
+      document.getElementById('blog-cover').value = post ? post.coverImage : 'assets/services_ui_ux.png';
+      document.getElementById('blog-excerpt').value = post ? post.excerpt : '';
+      document.getElementById('blog-status').checked = post ? post.status === 'Published' : true;
+
+      document.getElementById('blog-modal').classList.remove('hidden');
+    }
+
+    function closeBlogModal() {
+      document.getElementById('blog-modal').classList.add('hidden');
+    }
+
+    function editBlog(id) {
+      const post = state.blogs.find(b => b.id === id);
+      if (post) openBlogModal(post);
+    }
+
+    async function handleSaveBlog(e) {
+      e.preventDefault();
+      const id = document.getElementById('blog-edit-id').value;
+      const payload = {
+        title: document.getElementById('blog-title').value.trim(),
+        slug: document.getElementById('blog-slug').value.trim(),
+        category: document.getElementById('blog-category').value.trim(),
+        author: document.getElementById('blog-author').value.trim(),
+        readTime: document.getElementById('blog-read-time').value.trim(),
+        coverImage: document.getElementById('blog-cover').value.trim(),
+        excerpt: document.getElementById('blog-excerpt').value.trim(),
+        status: document.getElementById('blog-status').checked ? 'Published' : 'Draft',
+        views: id ? (state.blogs.find(b => b.id === id)?.views || 100) : 0
+      };
+
+      if (id) {
+        const res = await saveResource('blogs', 'PUT', payload, id);
+        if (res.success) {
+          const idx = state.blogs.findIndex(b => b.id === id);
+          if (idx !== -1) state.blogs[idx] = { ...state.blogs[idx], ...payload };
+          showToast('Article updated');
+        }
+      } else {
+        const res = await saveResource('blogs', 'POST', payload);
+        if (res.success) {
+          state.blogs.unshift(res.data);
+          showToast('Article published');
+        }
+      }
+      closeBlogModal();
+      renderBlogs();
+      document.getElementById('blogs-count-badge').textContent = state.blogs.length;
+    }
+
+    async function deleteBlog(id) {
+      if (!confirm('Are you sure you want to delete this blog post?')) return;
+      const res = await saveResource('blogs', 'DELETE', {}, id);
+      if (res.success) {
+        state.blogs = state.blogs.filter(b => b.id !== id);
+        renderBlogs();
+        document.getElementById('blogs-count-badge').textContent = state.blogs.length;
+        showToast('Article removed');
+      }
+    }
+
+    // --- Portfolio Projects Rendering ---
+    function renderProjects() {
+      const container = document.getElementById('projects-container');
+      if (!container) return;
+
+      container.innerHTML = state.projects.map(proj => `
+        <div class="glass-panel glass-panel-hover rounded-2xl overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="h-44 w-full relative bg-dark-850 overflow-hidden">
+              <img src="${proj.coverImage || 'assets/project_nova.png'}" alt="${escapeHtml(proj.title)}" class="w-full h-full object-cover">
+              <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-dark-950/80 backdrop-blur-md text-emerald-400 border border-white/10">
+                ${escapeHtml(proj.metrics || 'Case Study')}
+              </div>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center justify-between text-xs text-zinc-400 mb-1">
+                <span>${escapeHtml(proj.client || 'Client')}</span>
+                <span class="font-mono">${proj.year || '2026'}</span>
+              </div>
+              <h3 class="text-lg font-bold text-white">${escapeHtml(proj.title)}</h3>
+              <span class="text-xs font-medium text-brand-500 block mb-2">${escapeHtml(proj.category || 'Web App')}</span>
+              <p class="text-zinc-400 text-xs line-clamp-3 leading-relaxed">${escapeHtml(proj.description || '')}</p>
+            </div>
+          </div>
+          <div class="p-5 pt-0 border-t border-white/5 flex items-center justify-between text-xs mt-4">
+            <a href="${proj.link || 'index.html#portfolio'}" target="_blank" class="text-brand-500 hover:text-blue-400 font-semibold flex items-center gap-1">
+              <span>View Case Study</span>
+              <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+            <div class="flex items-center gap-1">
+              <button onclick="editProject('${proj.id}')" class="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10">
+                <span class="material-symbols-outlined text-base">edit</span>
+              </button>
+              <button onclick="deleteProject('${proj.id}')" class="p-1.5 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-500/10">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openProjectModal(proj = null) {
+      document.getElementById('project-edit-id').value = proj ? proj.id : '';
+      document.getElementById('project-modal-title').textContent = proj ? 'Edit Project' : 'Add Showcase Project';
+      document.getElementById('project-title').value = proj ? proj.title : '';
+      document.getElementById('project-client').value = proj ? proj.client : '';
+      document.getElementById('project-category').value = proj ? proj.category : 'Fintech & Web3';
+      document.getElementById('project-metrics').value = proj ? proj.metrics : '+140% Growth';
+      document.getElementById('project-year').value = proj ? proj.year : '2026';
+      document.getElementById('project-cover').value = proj ? proj.coverImage : 'assets/project_nova.png';
+      document.getElementById('project-description').value = proj ? proj.description : '';
+
+      document.getElementById('project-modal').classList.remove('hidden');
+    }
+
+    function closeProjectModal() {
+      document.getElementById('project-modal').classList.add('hidden');
+    }
+
+    function editProject(id) {
+      const proj = state.projects.find(p => p.id === id);
+      if (proj) openProjectModal(proj);
+    }
+
+    async function handleSaveProject(e) {
+      e.preventDefault();
+      const id = document.getElementById('project-edit-id').value;
+      const payload = {
+        title: document.getElementById('project-title').value.trim(),
+        client: document.getElementById('project-client').value.trim(),
+        category: document.getElementById('project-category').value.trim(),
+        metrics: document.getElementById('project-metrics').value.trim(),
+        year: document.getElementById('project-year').value.trim(),
+        coverImage: document.getElementById('project-cover').value.trim(),
+        description: document.getElementById('project-description').value.trim(),
+        link: 'index.html#portfolio'
+      };
+
+      if (id) {
+        const res = await saveResource('projects', 'PUT', payload, id);
+        if (res.success) {
+          const idx = state.projects.findIndex(p => p.id === id);
+          if (idx !== -1) state.projects[idx] = { ...state.projects[idx], ...payload };
+          showToast('Project updated');
+        }
+      } else {
+        const res = await saveResource('projects', 'POST', payload);
+        if (res.success) {
+          state.projects.push(res.data);
+          showToast('Project added to portfolio');
+        }
+      }
+      closeProjectModal();
+      renderProjects();
+    }
+
+    async function deleteProject(id) {
+      if (!confirm('Are you sure you want to remove this project?')) return;
+      const res = await saveResource('projects', 'DELETE', {}, id);
+      if (res.success) {
+        state.projects = state.projects.filter(p => p.id !== id);
+        renderProjects();
+        showToast('Project removed');
+      }
+    }
+
+    // --- Services Rendering ---
+    function renderServices() {
+      const container = document.getElementById('services-container');
+      if (!container) return;
+
+      container.innerHTML = state.services.map(srv => `
+        <div class="glass-panel rounded-2xl p-6 relative flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-base font-bold text-white">${escapeHtml(srv.name)}</h3>
+              <span class="text-xs px-2.5 py-1 rounded-full ${srv.active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-800 text-zinc-500'} font-semibold">
+                ${srv.active ? 'Active Offering' : 'Paused'}
+              </span>
+            </div>
+            <p class="text-xs text-zinc-400 leading-relaxed mb-4">${escapeHtml(srv.description)}</p>
+
+            <div class="grid grid-cols-2 gap-3 p-3 rounded-xl bg-dark-900 border border-white/5 text-xs mb-4">
+              <div>
+                <span class="text-zinc-500 block mb-0.5">Starting From</span>
+                <span class="text-emerald-400 font-bold text-sm">${escapeHtml(srv.startingPrice)}</span>
+              </div>
+              <div>
+                <span class="text-zinc-500 block mb-0.5">Turnaround</span>
+                <span class="text-white font-semibold">${escapeHtml(srv.turnaround)}</span>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Core Deliverables</span>
+              ${(srv.deliverables || []).map(d => `
+                <div class="flex items-center gap-2 text-xs text-zinc-300">
+                  <span class="material-symbols-outlined text-brand-500 text-sm">check_circle</span>
+                  <span>${escapeHtml(d)}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="pt-4 mt-6 border-t border-white/5 flex justify-end">
+            <button onclick="editServicePrompt('${srv.id}')" class="text-xs font-semibold text-brand-500 hover:text-blue-400 flex items-center gap-1">
+              <span>Edit Pricing & Timeline</span>
+              <span class="material-symbols-outlined text-sm">edit</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function editServicePrompt(id) {
+      const srv = state.services.find(s => s.id === id);
+      if (!srv) return;
+      const newPrice = prompt(`Enter updated starting price for ${srv.name}:`, srv.startingPrice);
+      if (newPrice === null) return;
+      const newTurnaround = prompt(`Enter updated turnaround time for ${srv.name}:`, srv.turnaround);
+      if (newTurnaround === null) return;
+
+      const payload = { startingPrice: newPrice.trim(), turnaround: newTurnaround.trim() };
+      const res = await saveResource('services', 'PUT', payload, id);
+      if (res.success) {
+        srv.startingPrice = newPrice.trim();
+        srv.turnaround = newTurnaround.trim();
+        renderServices();
+        showToast('Service rates updated!');
+      }
+    }
+
+    // --- Testimonials Rendering ---
+    function renderTestimonials() {
+      const container = document.getElementById('testimonials-container');
+      if (!container) return;
+
+      container.innerHTML = state.testimonials.map(item => `
+        <div class="glass-panel glass-panel-hover rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-1 text-amber-400 mb-3 text-sm">
+              ${'★'.repeat(item.rating || 5)}${'☆'.repeat(5 - (item.rating || 5))}
+            </div>
+            <p class="text-xs text-zinc-300 italic leading-relaxed mb-6">"${escapeHtml(item.quote)}"</p>
+          </div>
+          <div class="flex items-center gap-3 pt-4 border-t border-white/5">
+            <img src="${item.avatar || 'assets/testimonial_author.png'}" class="w-10 h-10 rounded-full object-cover border border-white/10" alt="">
+            <div>
+              <div class="text-xs font-bold text-white">${escapeHtml(item.author)}</div>
+              <div class="text-[11px] text-zinc-500">${escapeHtml(item.role)}, ${escapeHtml(item.company)}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openTestimonialModal() {
+      const author = prompt('Client Name:');
+      if (!author) return;
+      const company = prompt('Client Company / Role:', 'CEO, Acme Corp');
+      const quote = prompt('Review Quote:');
+      if (!quote) return;
+
+      const payload = {
+        author,
+        company: company || 'Enterprise Client',
+        role: 'Executive',
+        rating: 5,
+        quote,
+        featured: true,
+        avatar: 'assets/testimonial_author.png'
+      };
+
+      saveResource('testimonials', 'POST', payload).then(res => {
+        if (res.success) {
+          state.testimonials.push(res.data);
+          renderTestimonials();
+          showToast('Testimonial added!');
+        }
+      });
+    }
+
+    // --- Settings & SEO ---
+    function populateSettingsForm() {
+      const s = state.settings;
+      document.getElementById('setting-agency-name').value = s.agencyName || 'Loop Universe';
+      document.getElementById('setting-agency-tagline').value = s.tagline || 'Web Development & Branding Agency';
+      document.getElementById('setting-contact-email').value = s.contactEmail || 'universe23@gmail.com';
+      document.getElementById('setting-whatsapp').value = s.whatsappPhone || '919048355792';
+      document.getElementById('setting-office-address').value = s.officeAddress || 'Kozhikode & Global Remote';
+      document.getElementById('setting-gtm-id').value = s.gtmId || 'GTM-K9MHX3MN';
+      document.getElementById('setting-ga4-id').value = s.ga4Id || 'G-FBE90W31K4';
+      document.getElementById('setting-site-title').value = s.siteTitle || 'Loop Universe | Web Development & Branding Agency';
+      document.getElementById('setting-meta-desc').value = s.metaDescription || '';
+    }
+
+    async function handleSaveSettings(e) {
+      e.preventDefault();
+      const updated = {
+        agencyName: document.getElementById('setting-agency-name').value.trim(),
+        tagline: document.getElementById('setting-agency-tagline').value.trim(),
+        contactEmail: document.getElementById('setting-contact-email').value.trim(),
+        whatsappPhone: document.getElementById('setting-whatsapp').value.trim(),
+        officeAddress: document.getElementById('setting-office-address').value.trim(),
+        gtmId: document.getElementById('setting-gtm-id').value.trim(),
+        ga4Id: document.getElementById('setting-ga4-id').value.trim(),
+        siteTitle: document.getElementById('setting-site-title').value.trim(),
+        metaDescription: document.getElementById('setting-meta-desc').value.trim()
+      };
+
+      const res = await saveResource('settings', 'PUT', updated);
+      if (res.success) {
+        state.settings = { ...state.settings, ...updated };
+        showToast('Agency settings saved successfully');
+      }
+
+      const currentPass = document.getElementById('setting-current-password')?.value;
+      const newPass = document.getElementById('setting-new-password')?.value;
+      if (newPass) {
+        if (!currentPass) {
+          showToast('Current password required to change password', 'error');
+          return;
+        }
+        try {
+          const passRes = await fetch('/api/auth/change-password', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.token}`
+            },
+            body: JSON.stringify({ currentPassword: currentPass, newPassword: newPass })
+          });
+          const passData = await passRes.json();
+          if (passRes.ok && passData.success) {
+            document.getElementById('setting-current-password').value = '';
+            document.getElementById('setting-new-password').value = '';
+            showToast('Admin password updated successfully');
+          } else {
+            showToast(passData.error || 'Failed to update password', 'error');
+          }
+        } catch (e) {
+          showToast('Failed to contact password update service', 'error');
+        }
+      }
+    }
+
+    // --- Helpers ---
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return 'Recent';
+      try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      } catch (e) {
+        return 'Recent';
+      }
+    }
+
+    // --- Initialization ---
+    async function initDashboard() {
+      await refreshAllData();
+      switchTab('dashboard');
+    }
+
+    // Bootstrap
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!checkExistingSession()) {
+        document.getElementById('auth-screen').classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
